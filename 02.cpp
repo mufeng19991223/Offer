@@ -1,35 +1,53 @@
 #include <bits/stdc++.h>
-                         
+
 using namespace std;
 
-class Solution {
+class Solution
+{
 public:
-    string addBinary(string a, string b) {
-        int lena = a.length();
-        int lenb = b.length();
-        int carry = 0;
-        int len = max(lena, lenb);
-        string ans = "";
-        reverse(a.begin(), a.end());
-        reverse(b.begin(), b.end());
-        for(int i = 0; i < len; i++)
+    int divide(int a, int b)
+    {
+        int ans = 0;
+        //特判
+        if (a == INT_MIN && b == -1)
         {
-            carry += i < a.size()? a[i] == '1': 0;
-            carry += i < b.size()? b[i] == '1': 0;
-            ans.push_back((carry % 2)? '1': '0');
-            carry /= 2;
-        } 
-        if(carry)
-        {
-            ans.push_back('1');
+            return INT_MAX;
         }
-        reverse(ans.begin(), ans.end());
-        return ans;
+        // a b全置为负数 避免溢出int
+        bool flag = ((a > 0) ^ (b > 0)) ? 0 : 1;
+        if (a > 0)
+        {
+            a = -a;
+        }
+        if (b > 0)
+        {
+            b = -b;
+        }
+        while (a <= b)
+        {
+            // 判断 d >= INT_MIN 的原因：保证 d + d 不会溢出
+            // 可以这样判断的原因是：INT_MIN >> 1是最小值 -2^31 的一半，
+            // 而 a 的值不可能比 -2^31 还要小，所以 d 不可能比 INT_MIN >> 1 小
+            int k = 1, d = b;
+            while (d + d >= a && d >= INT_MIN >> 1)
+            {
+                d += d;
+                // 代码优化：如果 k 已经大于最大值的一半的话，那么直接返回最小值
+                // 因为这个时候 k += k 的话肯定会大于等于 2147483648 ，这个超过了题目给的范围
+                if (k > INT_MAX / 2)
+                {
+                    return INT_MIN;
+                }
+                k += k;
+            }
+            ans += k;
+            a -= d;
+        }
+        return flag ? ans : -ans;
     }
 };
+
 int main()
-{
-    Solution s;
-    cout << s.addBinary("11", "10");    
-    return 0;
+{   
+     return 0;
 }
